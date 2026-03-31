@@ -17,28 +17,43 @@ def clamp(value, lower, upper):
 def simulate_patient(patient_id, subtype, years):
     rows = []
 
-    abeta_start = random.uniform(620.0, 790.0)
-    abeta_drop = random.uniform(180.0, 340.0)
-    abeta_midpoint = random.uniform(3.0, 5.5)
-    abeta_slope = random.uniform(0.45, 0.85)
+    abeta_start = random.uniform(610.0, 790.0)
+    abeta_drop = random.uniform(170.0, 330.0)
+    abeta_midpoint = random.uniform(3.0, 5.8)
+    abeta_slope = random.uniform(0.4, 0.85)
+    abeta_patient_shift = random.gauss(0.0, 15.0)
 
     if subtype == "fast":
-        ptau_start = random.uniform(20.0, 28.0)
-        ptau_rise = random.uniform(55.0, 78.0)
-        ptau_midpoint = random.uniform(2.0, 3.4)
-        ptau_slope = random.uniform(0.9, 1.3)
+        ptau_start = random.uniform(20.0, 30.0)
+        ptau_rise = random.uniform(34.0, 62.0)
+        ptau_midpoint = random.uniform(2.8, 4.8)
+        ptau_slope = random.uniform(0.55, 1.0)
     else:
-        ptau_start = random.uniform(20.0, 28.0)
-        ptau_rise = random.uniform(25.0, 45.0)
-        ptau_midpoint = random.uniform(4.0, 5.8)
-        ptau_slope = random.uniform(0.45, 0.8)
+        ptau_start = random.uniform(20.0, 30.0)
+        ptau_rise = random.uniform(22.0, 50.0)
+        ptau_midpoint = random.uniform(3.6, 6.2)
+        ptau_slope = random.uniform(0.4, 0.9)
+
+    ptau_patient_shift = random.gauss(0.0, 4.5)
+    visit_noise_scale = random.uniform(2.5, 6.5)
 
     for year in years:
-        abeta_signal = abeta_start - abeta_drop * logistic(year, abeta_midpoint, abeta_slope)
-        ptau_signal = ptau_start + ptau_rise * logistic(year, ptau_midpoint, ptau_slope)
+        abeta_signal = (
+            abeta_start
+            - abeta_drop * logistic(year, abeta_midpoint, abeta_slope)
+            + abeta_patient_shift
+        )
+        ptau_signal = (
+            ptau_start
+            + ptau_rise * logistic(year, ptau_midpoint, ptau_slope)
+            + ptau_patient_shift
+        )
 
-        abeta_value = clamp(abeta_signal + random.gauss(0.0, 18.0), 200.0, 800.0)
-        ptau_value = clamp(ptau_signal + random.gauss(0.0, 3.0), 20.0, 110.0)
+        year_specific_ptau_noise = random.gauss(0.0, visit_noise_scale)
+        year_specific_abeta_noise = random.gauss(0.0, 22.0)
+
+        abeta_value = clamp(abeta_signal + year_specific_abeta_noise, 200.0, 800.0)
+        ptau_value = clamp(ptau_signal + year_specific_ptau_noise, 20.0, 110.0)
 
         rows.append(
             {
