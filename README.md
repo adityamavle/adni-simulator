@@ -26,4 +26,4 @@ In the current synthetic experiment:
 - fast group mean `p_tau`: `27.39 -> 91.50`
 - simple `p_tau` slope classifier: accuracy `1.0`, sensitivity `1.0`, specificity `1.0`
 
-This is a proof-of-concept synthetic result, not validation against raw ADNI blood data.
+Proof-of-concept synthetic result, not validation against raw ADNI blood data.
